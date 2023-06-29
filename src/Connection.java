@@ -5,14 +5,15 @@ import java.net.Socket;
 public class Connection {
 
     public void connection() throws IOException {
-
-        try (ServerSocket serverSocket = new ServerSocket(8084)) {
-            while (true) {
+        while (true) {
+            try (ServerSocket serverSocket = new ServerSocket(8084)) {
                 Socket socket = serverSocket.accept();
                 System.out.println("client connected");
-                try (BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                     PrintWriter output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()))) {
+                BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+                while (socket.isConnected()) {
                     String header = input.readLine();
+                    if (header==null)break;
                     String name = parseHeader(header);
                     System.out.println(header);
                     while (input.ready()) {
@@ -22,6 +23,7 @@ public class Connection {
                     output.println("Content-Type: text/html; charset=utf-8");
                     output.println();
                     output.println("<p>Привет " + name + "!</p>");
+                    output.println("<a href='http://localhost:63342/SimpleServer/my1.html'>link</a>");
                     output.flush();
 
                 }
