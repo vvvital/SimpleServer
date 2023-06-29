@@ -4,17 +4,14 @@ import java.net.Socket;
 
 public class Connection {
 
-    private BufferedReader input;
-    private PrintWriter output;
-
     public void connection() throws IOException {
         while (true) {
             try (ServerSocket serverSocket = new ServerSocket(8084)) {
                 Socket socket = serverSocket.accept();
                 System.out.println("client connected");
-                input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                output = new PrintWriter(socket.getOutputStream());
-                SocketProcessor processor = new SocketProcessor(socket, input, output);
+                BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter output = new PrintWriter(socket.getOutputStream());
+                SocketProcessor processor = new SocketProcessor(input, output);
                 processor.run();
                 System.out.println("client disconnected");
             }
@@ -22,15 +19,14 @@ public class Connection {
     }
 
     private class SocketProcessor implements Runnable {
-        public SocketProcessor(Socket socket, BufferedReader input, PrintWriter output) {
-            this.socket=socket;
+        public SocketProcessor(BufferedReader input, PrintWriter output) {
             this.input = input;
             this.output = output;
         }
 
-        private BufferedReader input;
-        private PrintWriter output;
-        private Socket socket;
+        private final BufferedReader input;
+        private final PrintWriter output;
+
 
         @Override
         public void run() {
